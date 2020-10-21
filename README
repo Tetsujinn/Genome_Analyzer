@@ -9,7 +9,8 @@
 Implementation of a genetic code analyzer
 
 
-The purpose is to implement a set of analyses which can provide a deep insight on the content of very large genetic codes.
+The purpose is to implement a set of analyses which can provide a deep
+insight on the content of very large genetic codes.
 
 
 First program take a file in FASTA format to prepare the data.
