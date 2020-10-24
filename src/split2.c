@@ -89,7 +89,7 @@ void split(const char *t){
 	//Open sequence file
 	fd_s=fopen(seq_name,"w");      
 	//Store 1 sequence in her file
-	fwrite(t+seq_start,sizeof(char),seq_len,fd_s);
+	fwrite(t+seq_start,sizeof(char),seq_len-2,fd_s);
 	//Close the sequence file
 	fclose(fd_s);
 	//Free memory allocate for the IdSeq
