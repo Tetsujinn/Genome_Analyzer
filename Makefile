@@ -5,7 +5,7 @@ OFLAGS=-O3
 
 all: genysis split split2
 
-genysis: src/genysis.c
+genysis: src/genysis.c src/load.h src/detection.h src/rdtsc.h
 	$(CC) $(CFLAGS) $(OFLAGS) $< -o $@
 
 split: src/split.c
