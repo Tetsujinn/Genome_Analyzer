@@ -5,6 +5,10 @@
 #include"detection.h"
 #include"rdtsc.h"
 
+
+#define SEUIL 10
+
+
 //Genere la mapping des codons start et stop d'une sequence ADN
 gene_map mapping(char *seq){
 
@@ -137,6 +141,55 @@ void generate_prot(char *arn, char **codons){
 
 }
 
+//
+void detect_mut(char *gene){
+  int pos=0;
+  int occurrence=0;
+  double risk_rate=0.00;
+
+  int i=0;
+  int cpt_zar=0;
+  int zar[1000]={0};
+
+  while(gene[pos]!='\0'){
+
+    if(gene[pos]=='G' || gene[pos]=='C'){
+      if(occurrence==0)
+        printf("[");
+      occurrence++;
+    }else{
+      if(occurrence>0){
+        printf("]");
+        cpt_zar++;
+
+        risk_rate = occurrence * 100.00;
+        risk_rate = risk_rate / strlen(gene);
+
+        if(risk_rate>SEUIL){
+          //On a trouvé une zone a risque qui commence en pos-occurence
+          zar[i]=cpt_zar;
+          i++;
+        }
+        
+        occurrence=0;
+      }
+    }
+    printf("%c",gene[pos]);
+    
+    pos++;
+  }
+
+  printf("\n");
+  i=0;
+  if(zar[i]==0)
+    printf("\nAucune zone est à risque de mutation\n");
+  while(zar[i]!=0)
+    printf("\nz%d est à risque de mutation\n", zar[i++]);
+
+  printf("\n");
+
+}
+
 
 //
 int main(int argc, char **argv){
@@ -211,7 +264,7 @@ char* codons[192]={"AAA","Lys","K",
 					 "UUU","Phe","F"};
 
 
-  printf("*** CHARGE LA SEQUENCE ***\n\n");
+  printf("*** CHARGE LA PREMIERE SEQUENCE ***\n\n");
   //Charge la sequence
   char *seq=load_data(argv[1]);
 
@@ -284,11 +337,24 @@ char* codons[192]={"AAA","Lys","K",
 
 ///Detect mutation
 
+  for(int i=0; i < gm->gene_counter; i++){
+    detect_mut(ARN_m[i]);
+    printf("\n");
+  }
 
 
 
 
 
+
+  //Libère la mémoire des genes en ARN
+  free(ARN_m);
+  //Libère la mémoire du mapping
+  free(gm);
+
+  //printf("*** CHARGE LA DEUXIEME SEQUENCE ***\n\n");
+  //Charge la sequence
+  //char *seq2=load_data(argv[2]);
 
 ///Hamming
 ///To compare 2 sequences :
@@ -298,12 +364,12 @@ char* codons[192]={"AAA","Lys","K",
 
 
 
-  //Libère la mémoire des genes en ARN
-  free(ARN_m);
-  //Libère la mémoire du mapping
-  free(gm);
+
   //Libère la mémoire de la séquence
   release_data(seq);
+  //Libère la mémoire de la séquence
+  //release_data(seq2);
+
 
   return 0;
 }
