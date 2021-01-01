@@ -99,7 +99,7 @@ char **generate_ARN(gene_map gm,char* seq){
   return ARN_m;
 }
 
-
+//
 void generate_prot(char *arn, char **codons){
   int i=0;
   int pos=0;
@@ -143,46 +143,69 @@ void generate_prot(char *arn, char **codons){
 
 //
 void detect_mut(char *gene){
+  //Position dans le gene
   int pos=0;
+  //Le nombre de G et de C a la suite
   int occurrence=0;
+  //Le % de G et C à la suite par rapport aux nombres totals de nucléotide
   double risk_rate=0.00;
-
+  //Nombre de zone a risque trouve
   int i=0;
+  //Compteur de Zones (qui sont POTENTIELLEMENT a risque)
   int cpt_zar=0;
+  //Tableau pour stocker lesquelles sont a risque parmis toute les zones POTENTIELLES
   int zar[1000]={0};
 
+  //ON parcour le gene caractere par caractere
   while(gene[pos]!='\0'){
 
+    //Si on croise un G ou un C, on incrémente l'occurrence
     if(gene[pos]=='G' || gene[pos]=='C'){
       if(occurrence==0)
+        //Début d'une zone
         printf("[");
+
       occurrence++;
+
+    //Sinon
     }else{
+      //Si on a croisé une zone
       if(occurrence>0){
+        //Fin d'une zone
         printf("]");
+        //On incrémente le compteur de zone
         cpt_zar++;
 
+        //On calcule le %
         risk_rate = occurrence * 100.00;
         risk_rate = risk_rate / strlen(gene);
 
+        //Si on depasse le seuil pour etre a risque
         if(risk_rate>SEUIL){
           //On a trouvé une zone a risque qui commence en pos-occurence
           zar[i]=cpt_zar;
+          //On incrémente le nombre de zone a risque
           i++;
         }
         
+        //On réinitialise l'occurrence pour terminer la zone
         occurrence=0;
       }
-    }
-    printf("%c",gene[pos]);
-    
-    pos++;
-  }
 
+    }
+    //Affiche le caractere courant
+    printf("%c",gene[pos]);
+    //On passe au caractere suivant
+    pos++;
+
+  }
   printf("\n");
+
+  //Si le 1er entier est a 0, on a trouve aucune zone a risque
   i=0;
-  if(zar[i]==0)
+  if(zar[0]==0)
     printf("\nAucune zone est à risque de mutation\n");
+  //Sinon on les affiches
   while(zar[i]!=0)
     printf("\nz%d est à risque de mutation\n", zar[i++]);
 
@@ -335,15 +358,14 @@ char* codons[192]={"AAA","Lys","K",
   printf("%lf cycles to generate protein for all genes\n\n",after-before);
 
 
-///Detect mutation
+///DETECTION DES ZONES A RISQUES DE MUTATIONS
 
+  printf("*** RECHERCHE DE ZONE A RISQUE DE MUTATION ***\n\n");
+  //Lance la detection de zone a risque de mutation pour chaque gene de la sequence
   for(int i=0; i < gm->gene_counter; i++){
     detect_mut(ARN_m[i]);
     printf("\n");
   }
-
-
-
 
 
 
