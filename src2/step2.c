@@ -2,57 +2,10 @@
 #include<stdlib.h>
 #include<string.h>
 #include <sys/stat.h>
+#include "functions.h"
+
 #define MAX_GENES 100000
 
-int min(int x, int y, int z){
-	if(x<y && x<z)
-		return x;
-	else if(y<x && y<z)	
-		return y;
-	else if(z<x && z<y)
-		return z;		
-}	
-
-int find(char*codon, char*seq){
-
-	unsigned char found = 0;
-	unsigned long long pos;
-	
-	for(pos = 0; !found && pos < strlen(seq) - 3; pos++)
-		found = !strncmp(codon, seq + pos, 3);
-	
-	if(found)
-	
-		return pos;
-	
-	return -1;		
-}
-
-struct stat st;
-
-char *get_SeqGenome(char *fp){
-
-	FILE * file;
-	file = fopen(fp, "r");
-
-	 stat(fp, &st);
-	 int size = st.st_size;	
-
-
-
-	 char *Sequence_ = malloc(sizeof(char) * size);
-	   unsigned i=0;
-	   while ( ! feof( file ) && (i<size) ) {
-		int theCurrentChar;        
-		theCurrentChar = fgetc( file );
-		 Sequence_[i] = theCurrentChar;
-
-		 i++;
-	    }	
-
-	   fclose(file); 
-	return Sequence_;
-}
 
 
 struct gene_map_s {
@@ -69,43 +22,79 @@ struct gene_map_s {
 };
 
 
-
-
 int main(){
  		
 int gene_start, gene_stop;
 int gene_stop1, gene_stop2, gene_stop3;
 
 int initial_start = 0;
-struct gene_map_s gene_map;
 
-unsigned int cond = 1;
+struct gene_map_s gene_map;
+int cond = -1;
 
    
 do{
    
-   gene_start = find("ATG", initial_start + get_SeqGenome("LC565412.1")) + initial_start;
-         printf("gene_start : %d\n",gene_start);
-   gene_stop1 = find("TGA", get_SeqGenome("LC565412.1") + gene_start) + gene_start;
-      	 printf("gene_stop1 : %d\n",gene_stop1);
-   gene_stop2 = find("TAG", get_SeqGenome("LC565412.1") + gene_start) + gene_start;
-         printf("gene_stop2 : %d\n",gene_stop2);
-   gene_stop3 = find("TAA", get_SeqGenome("LC565412.1") + gene_start) + gene_start;
- 	 printf("gene_stop3 : %d\n",gene_stop3);
-   gene_stop = min(gene_stop1, gene_stop2, gene_stop3);
-         printf("gene_stop : %d\n",gene_stop);
-       
-       printf("-----------------"); 
-  	
-  	if (gene_stop && gene_start)
-  	{
-  	        gene_map.gene_start_in[gene_map.genes_counter] = gene_start;
-    		gene_map.gene_stop_in[gene_map.genes_counter] = gene_stop;
-		gene_map.genes_counter++;
+   cond = find("ATG", initial_start + get_SeqGenome("LC547526.1")) + initial_start;
+   
+   if(cond != -1){
+	gene_start = cond -3;
+   			printf("gene_start : %d\n", gene_start);
+   			
+   	gene_stop1 = find("TGA", get_SeqGenome("LC547526.1") + gene_start) + gene_start;
 
-  	}else cond = (gene_stop || gene_start);
+   	gene_stop2 = find("TAG", get_SeqGenome("LC547526.1") + gene_start) + gene_start;
+
+   	gene_stop3 = find("TAA", get_SeqGenome("LC547526.1") + gene_start) + gene_start;
+
+	if(gene_stop1 < 0){
+		if(gene_stop2){
+			cond = gene_stop3;
+				printf("gene_stop : %d\n", cond);
+		}else{
+			if(gene_stop3<0){
+				cond = gene_stop2;
+					printf("gene_stop : %d\n", cond);
+			}else{
+				cond = min(gene_stop2, gene_stop3);
+					printf("gene_stop : %d\n", cond);
+			}
+		}
+
+	}else{
+		if(gene_stop2 <0){
+			if(gene_stop3 <0){
+				cond = gene_stop1;
+				printf("gene_stop : %d\n", cond);	
+			}else{
+				cond = min(gene_stop1, gene_stop3);
+						printf("gene_stop : %d\n", cond);
+			}
+		}else{
+			if(gene_stop3 < 0){
+				
+				cond = min(gene_stop1, gene_stop2);
+					printf("gene_stop : %d\n", cond);
+			}else{
+				int mini=min(gene_stop1,gene_stop2);
+        			cond = min(mini,gene_stop3);
+					printf("gene_stop : %d\n", cond);
+			}
+		}
+		
+	}
+	if(cond != -1){
 	
-}while(cond >0);
+	
+   		//gene_map.gene_start_in[gene_map.genes_counter] = gene_start;
+    		//gene_map.gene_stop_in[gene_map.genes_counter] = cond - 3;
+		//gene_map.genes_counter++;
+		initial_start += gene_stop + 3; 
+	}	
+	}
+	
+}while(cond != -1);
+
 //printf("%lln, %lln, %lld", gene_map.gene_start_in, gene_map.gene_stop_in, gene_map.genes_counter++);
 }	
 	
