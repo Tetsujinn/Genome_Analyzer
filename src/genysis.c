@@ -3,6 +3,7 @@
 
 #include"load.h"
 #include"detection.h"
+#include"popcount.h"
 #include"rdtsc.h"
 
 
@@ -214,11 +215,50 @@ void detect_mut(char *gene){
 }
 
 
+//Calcul le pourcentage de correspondance entre les 2 sequences
+//seq DOIT etre la plus grande
+void matching_rate(char *seq, char *seq2){
+  //On stocke le minimum entre les tailles des 2 sequences
+  int mini=min(strlen(seq),strlen(seq2));
+
+  //
+  double d=0;
+  int pos=0;
+  //Parcours la plus grande sequence, de base en base
+  while(seq[pos+mini-1]!='\0'){
+    //Affiche le morceau de la grande sequence qui sera comparee 
+    for(int i=0;i<mini;i++)
+      printf("%c",seq[pos+i]);
+
+    printf("\n");
+    //Affiche la petite sequence qui sera comparee
+    for(int i=0;i<mini;i++)
+      printf("%c",seq2[i]);
+
+    //XOR caractere par caractere les deux chaines
+    //Puis compte le nombre de bits a 1 total 
+    for(int i=0;i<mini;i++)
+      d += popcount( seq[pos+i] ^ seq2[i] );
+
+    //Nombre total de bits -> 100% de bits differents
+    //Nombre de bit a 1    -> y% de bits differents
+    d = d * 100;
+    d = d / (8*mini);
+
+    //Affiche le résultat trouve
+    printf("\n\nIl y a %lf%% de bits diférrents entre ces 2 séquences.\n\n",d);
+
+    d=0;
+    pos++;
+  }
+}
+
+
 //
 int main(int argc, char **argv){
   //Check arg
-  if(argc<2)
-    return printf("Usage: %s [file]\n",argv[0]);
+  if(argc<3)
+    return printf("Usage: %s [file seq1] [file seq2]\n",argv[0]);
 
 //Charge les codons en mémoire
 char* codons[192]={"AAA","Lys","K",
@@ -366,32 +406,26 @@ char* codons[192]={"AAA","Lys","K",
     detect_mut(ARN_m[i]);
     printf("\n");
   }
-
-
-
+  printf("\n");
   //Libère la mémoire des genes en ARN
   free(ARN_m);
   //Libère la mémoire du mapping
   free(gm);
 
-  //printf("*** CHARGE LA DEUXIEME SEQUENCE ***\n\n");
+
+///MATCHING RATE SUR LES BITS (PAS SUR LES BASES)
+
+  printf("*** CHARGE LA DEUXIEME SEQUENCE ***\n\n");
   //Charge la sequence
-  //char *seq2=load_data(argv[2]);
+  char *seq2=load_data(argv[2]);
 
-///Hamming
-///To compare 2 sequences :
-///		Compress them
-///		res = seq1 XOR seq2
-///		popcount(res)
-
-
+  matching_rate(seq,seq2);
 
 
   //Libère la mémoire de la séquence
   release_data(seq);
   //Libère la mémoire de la séquence
-  //release_data(seq2);
-
+  release_data(seq2);
 
   return 0;
 }
