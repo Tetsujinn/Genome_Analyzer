@@ -3,19 +3,19 @@ CC=gcc
 CFLAGS=-Wall
 OFLAGS=-O3
 
-all: genysis split split2
+all: bin/genysis bin/split bin/split2
 
-genysis: src/genysis.c src/load.h src/detection.h src/popcount.h src/rdtsc.h
+bin/genysis: src/genysis.c src/load.h src/detection.h src/popcount.h src/rdtsc.h
 	$(CC) $(CFLAGS) $(OFLAGS) $< -o $@
 
-split: src/split.c
+bin/split: src/split.c
 	$(CC) $(CFLAGS) $(OFLAGS) $< -o $@
 
-split2: src/split2.c
+bin/split2: src/split2.c
 	$(CC) $(CFLAGS) $(OFLAGS) $< -o $@
 
 clean:
-	rm -Rf *~ src/*~ genysis split split2
+	rm -Rf *~ src/*~ bin/genysis bin/split bin/split2
 
 clean_file:
 	rm 6* 7* L* MN* MT* MW* N* description.txt
