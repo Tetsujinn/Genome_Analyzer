@@ -87,7 +87,7 @@ int main(int argc, char **argv){
 
  char *data=Generating_mRNA(argv[1]);
 
- //Generating_mRNA(data);
+ Generating_mRNA(data);
  release_data(data);
 
 return 0;
