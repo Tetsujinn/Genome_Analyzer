@@ -1,18 +1,23 @@
 #include <stdio.h>
 #include<string.h>
 
-typedef enum {A = 'A',T = 'T', C ='C', G = 'G'} extrema;
+#define A 0
+#define G 3
+#define T 2 
+#define C 1
 
-extrema nucleobase_encode(char n)
+typedef enum {a = 'A',t = 'T', c ='C', g = 'G'} nucleobase;
+
+nucleobase nucleobase_encode(char n)
 {
-    extrema check = n;
+    nucleobase check = n;
     n = tolower((unsigned char) check);
     switch(n){
-        case A: printf("neg inf"); return 1;
-        case T: printf("zero"); return 2;
-        case C: printf("pos inf"); return 3;
-        case G: printf("pos inf"); return 0;
-        default: printf("not special"); break;
+        case a: printf("A"); return 1;
+        case t: printf("T"); return 2;
+        case c: printf("C"); return 3;
+        case g: printf("G"); return 0;
+        default: printf("not special\n"); break;
     }
 
 }
@@ -35,9 +40,12 @@ if(argc != 2)
     	unsigned char compress=0;
 	  int i=0;
 	  char c;
-	  while((c=fgetc(fd))!=EOF){	    		
-	  	printf("%d\n", nucleobase_encode('c')); 
-	  	fputc(compress,fd_c);
+	  while((c=fgetc(fd))!=EOF){
+	  	char to_encode = nucleobase_encode(c);	    		
+	  	printf("%c\n", to_encode); 
+	  	//int z = nucleobase_encode(c);
+	  	//fputc(z,fd_c);
+	  	i++;
 	  }
 	 fclose(fd);
  	 fclose(fd_c);
