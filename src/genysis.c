@@ -288,7 +288,7 @@ if(rank == 0){
                   i++;    
         } 
             j++;
-            printf("%d\n",j);
+            //printf("%d\n",j);
             //printf("%s and %ld \n", name_file[j], strlen(name_file));                      
     } 
     for(j =0; j<MAX; j++){
@@ -301,12 +301,49 @@ if(rank == 0){
         for(int j = 0; j < MAX; j++){
           MPI_Recv(&inmsg,30, MPI_CHAR, source, Tag1, MPI_COMM_WORLD,  MPI_STATUS_IGNORE);
           printf("%s\n",inmsg);
-         char *seq = load_data(inmsg);
+          /*char *seq = load_data(inmsg);
           printf("*** MAPPING EN COURS ***\n\n");
           //Map la sequence avec la structure
-          //gene_map gm=mapping(seq);*/
-        } 
-        //printf("faux");
+          //gene_map gm=mapping(seq);
+          
+          printf("*** GENERATION DE L'ARN MESSAGER POUR CHAQUE GENE ***\n\n");
+          //Genere l'ARN_m pour chaque gene de la sequence
+          char** ARN_m=generate_ARN(gm,seq);
+
+          int pos=0;
+          //Pour chaque gene trouvé
+          for(int i=0; i < gm->gene_counter; i++){
+            printf("(ADN)Gene %d : ",i+1);
+
+            //Initialise la pos au debut du gene
+            pos=gm->gene_start[i];
+
+            //On parcours le gene caractére par caractére pour les afficher
+            /*while(pos<=gm->gene_end[i]){
+              printf("%c", seq[pos]);
+              pos++;
+            }*/
+            //printf("(ARN)Gene %d : ",i+1); 
+            i++;
+          }
+
+          printf("*** GENERATION DES PROTEINES ***\n\n");
+          //Genere l'ARN_m pour chaque gene de la sequence
+          for(int i=0; i < gm->gene_counter; i++){
+            generate_prot(ARN_m[i], codons);
+          }
+
+          for(int i=0; i < gm->gene_counter; i++){
+            detect_mut(ARN_m[i]);
+          }
+
+          free(ARN_m);
+          //Libère la mémoire du mapping
+          free(gm);
+
+          //Libère la mémoire de la séquence
+          release_data(seq);*/
+          } 
 }
   
 MPI_Finalize();
