@@ -79,7 +79,7 @@ char **generate_ARN(gene_map gm,char* seq){
   int pos=0;
   int pos_arn=0;
   //Pour chaque gene trouvé
-  //#pragma omp parallel private(i)
+  #pragma omp parallel private(i)
   for(int i=0; i < gm->gene_counter; i++){
     //Init la pos au debut du gene
     pos=gm->gene_start[i];
@@ -287,13 +287,12 @@ if(rank == 0){
                   //printf("%c\n", name_file[j][i]);
                   i++;    
         } 
-            j++;
             //printf("%d\n",j);
             //printf("%s and %ld \n", name_file[j], strlen(name_file));                      
-    } 
-    for(j =0; j<MAX; j++){
             dest = 1;
             MPI_Send(&name_file[j],10, MPI_CHAR, dest, Tag1, MPI_COMM_WORLD);
+            j++;
+
     }
 }else if (rank == 1) {
         source = 0;
@@ -301,8 +300,8 @@ if(rank == 0){
         for(int j = 0; j < MAX; j++){
           MPI_Recv(&inmsg,30, MPI_CHAR, source, Tag1, MPI_COMM_WORLD,  MPI_STATUS_IGNORE);
           printf("%s\n",inmsg);
-          /*char *seq = load_data(inmsg);
-          printf("*** MAPPING EN COURS ***\n\n");
+          char *seq = load_data(inmsg);
+          /*printf("*** MAPPING EN COURS ***\n\n");
           //Map la sequence avec la structure
           //gene_map gm=mapping(seq);
           
@@ -322,7 +321,7 @@ if(rank == 0){
             /*while(pos<=gm->gene_end[i]){
               printf("%c", seq[pos]);
               pos++;
-            }*/
+            }
             //printf("(ARN)Gene %d : ",i+1); 
             i++;
           }
