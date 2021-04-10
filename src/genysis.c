@@ -5,11 +5,10 @@
 #include"detection.h"
 #include"popcount.h"
 #include"rdtsc.h"
-
+#include"MPI.h"
 
 #define SEUIL 10
-#define MAX 20000
-const char* filename = "description.txt";
+#define SIZE 4000
 
 //Genere la mapping des codons start et stop d'une sequence ADN
 gene_map mapping(char *seq){
@@ -228,14 +227,14 @@ void matching_rate(char *seq, char *seq2){
   //Parcours la plus grande sequence, de base en base
   while(seq[pos+mini-1]!='\0'){
     //Affiche le morceau de la grande sequence qui sera comparee 
-    for(int i=0;i<mini;i++)
+    /*for(int i=0;i<mini;i++)
       printf("%c",seq[pos+i]);
-
-    printf("\n");
+    */
+    //printf("\n");
     //Affiche la petite sequence qui sera comparee
-    for(int i=0;i<mini;i++)
+    /*for(int i=0;i<mini;i++)
       printf("%c",seq2[i]);
-
+    */
     //XOR caractere par caractere les deux chaines
     //Puis compte le nombre de bits a 1 total 
     for(int i=0;i<mini;i++)
@@ -247,87 +246,132 @@ void matching_rate(char *seq, char *seq2){
     d = d / (8*mini);
 
     //Affiche le résultat trouve
-    printf("\n\nIl y a %lf%% de bits diférrents entre ces 2 séquences.\n\n",d);
+    //printf("\n\nIl y a %lf%% de bits diférrents entre ces 2 séquences.\n\n",d);
 
     d=0;
     pos++;
   }
 }
 
+
 //
 int main(int argc, char **argv){
   //Check arg
-  /*if(argc<3)
-    return printf("Usage: %s [file seq1] [file seq2]\n",argv[0]);
-*/
+  if(argc<2)
+    return printf("Usage: %s [file seq1]\n",argv[0]);
+
 //Charge les codons en mémoire
-MPI_Init(&argc, &argv);
-char inmsg[30],outmsg0[30];
-int size, rank;
-MPI_Status status;
+char* codons[192]={"AAA","Lys","K",
+		    		 "AAC","Asn","N",
+		    		 "AAG","Lys","K",
+		     		 "AAU","Asn","N",
+					 "ACA","Thr","T",
+					 "ACC","Thr","T",
+					 "ACG","Thr","T",
+					 "ACU","Thr","T",
+					 "AGA","Arg","R",
+					 "AGC","Ser","S",
+					 "AGG","Arg","R",
+					 "AGU","Ser","S",
+					 "AUA","Ile","I",
+					 "AUC","Ile","I",
+					 "AUG","Met","M",
+					 "AUU","Ile","I",
+					 "CAA","Gln","Q",
+					 "CAC","His","H",
+					 "CAG","Gln","Q",
+					 "CAU","His","H",
+					 "CCA","Pro","P",
+					 "CCC","Pro","P",
+					 "CCG","Pro","P",
+					 "CCU","Pro","P",
+					 "CGA","Arg","R",
+					 "CGC","Arg","R",
+					 "CGG","Arg","R",
+					 "CGU","Arg","R",
+					 "CUA","Leu","L",
+					 "CUC","Leu","L",
+					 "CUG","Leu","L",
+					 "CUU","Leu","L",
+					 "GAA","Glu","E",
+					 "GAC","Asp","D",
+					 "GAG","Glu","E",
+					 "GAU","Asp","D",
+					 "GCA","Ala","A",
+					 "GCC","Ala","A",
+					 "GCG","Ala","A",
+					 "GCU","Ala","A",
+					 "GGA","Gly","G",
+					 "GGC","Gly","G",
+					 "GGG","Gly","G",
+					 "GGU","Gly","G",
+					 "GUA","Val","V",
+					 "GUC","Val","V",
+					 "GUG","Val","V",
+					 "GUU","Val","V",
+					 "UAA","Stp","O",
+					 "UAC","Tyr","Y",
+					 "UAG","Stp","O",
+					 "UAU","Tyr","Y",
+					 "UCA","Ser","S",
+					 "UCC","Ser","S",
+					 "UCG","Ser","S",
+					 "UCU","Ser","S",
+					 "UGA","Stp","O",
+					 "UGC","Cys","C",
+					 "UGG","Trp","W",
+					 "UGU","Cys","C",
+					 "UUA","Leu","L",
+					 "UUC","Phe","F",
+					 "UUG","Leu","L",
+					 "UUU","Phe","F"};
+
+MPI_Init(&argc,&argv);
+
+int rank;
 MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+int size;
 MPI_Comm_size(MPI_COMM_WORLD, &size);
-int Tag1 = 1000, Tag2, dest, source;
-char name_fileRecv[MAX][12] = {0};
-char y[10];
-if(rank == 0){ 
-  FILE *in_file = fopen(filename, "r");
-    char name_file[MAX][10];
-    struct stat sb;
-    stat(filename, &sb);
 
-    char *file_contents = malloc(sb.st_size);
-    int j =0;
-    while (fscanf(in_file, "%[^\n] ", file_contents) != EOF && j < MAX) {
-        //printf("%s\n", file_contents);
-        
-        int i =0;
-        while(file_contents[i] != ' '){
-                //chaine[i] = ;
-                name_file[j][i]= file_contents[i+1];
-               // printf("%c\n", name_file[j][i]);
-                i++;   
-              
-        }
-        //j++;
-            //printf("%s and %ld \n", name_file[j], strlen(name_file));
-            //dest = 1;
-          
-            
-              //MPI_Send(&name_file,strlen(name_file), MPI_CHAR, dest, Tag1, MPI_COMM_WORLD);
+if (rank == 0) {
+    printf("*** CHARGE LA PREMIERE SEQUENCE ***\n\n");
+    //Charge la sequence
+    char *seq=load_data(argv[1]);
+    gene_map gm=mapping(seq);
+    char** ARN_m=generate_ARN(gm,seq);
+    int pos=0;
+  //Pour chaque gene trouvé
+  for(int i=0; i < gm->gene_counter; i++){
+    //Initialise la pos au debut du gene
+    pos=gm->gene_start[i];
 
+    //On parcours le gene caractére par caractére pour les afficher
+    while(pos<=gm->gene_end[i]){
+      pos++;
     }
-           
-   // }
-    fclose(in_file);
-    exit(EXIT_SUCCESS);
-   // for(int k =0; k < MAX; k++)
-    MPI_Scatter(name_file, MAX/size, MPI_CHAR, y, MAX/size, MPI_CHAR, 0, MPI_COMM_WORLD);
-    
-       
-}else if (rank == 1) {
-        source = 0; int k = 0;
-        memset(inmsg, 0, 30);
-        for(int j = 0; j < MAX; j++){
-    MPI_Scatter(name_file, MAX/size, MPI_CHAR, y, MAX/size, MPI_CHAR, 0, MPI_COMM_WORLD);
-          //char path[20] = "../";
-          //strcat(path, inmsg);
-          printf("%s\n",y);
-        
-         /*FILE *in_file2 = fopen(inmsg, "r");
-          if(in_file2 == NULL)
-          {
-            printf("Error!");   
-          }else
-            printf("openning file");
-          //printf("*** CHARGE LA PREMIERE SEQUENCE ***\n\n");
-          //Charge la sequence
-          //char *seq=load_data(argv[1]);
-            fclose(in_file2);
-        */}
-        //printf("its rank %d", rank);
+  }
+  for(int i=0; i < gm->gene_counter; i++){
+    generate_prot(ARN_m[i], codons);
+  }
+  for(int i=0; i < gm->gene_counter; i++){
+    detect_mut(ARN_m[i]);
+  }
+    free(ARN_m);
+    free(gm);
+    int strlength = strlen(seq);
+    /*char buff[strlength];
+    buff = seq;*/
+    MPI_Send(&seq, strlength, MPI_CHAR, 1, 0, MPI_COMM_WORLD);
+
+} else if (rank == 1) {
+   char buff[SIZE];
+    MPI_Recv(&buff, SIZE, MPI_CHAR, 0, 0, MPI_COMM_WORLD,
+             MPI_STATUS_IGNORE);
+    printf("ok");
 }
-  
-MPI_Finalize();
-return 0;
+
+  MPI_Finalize();
+
+
+  return 0;
 }
