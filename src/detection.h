@@ -1,4 +1,4 @@
-#define MAX_GENES 1000
+//#define MAX_GENES 1000
 
 typedef struct gene_map_s {
 
