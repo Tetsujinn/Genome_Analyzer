@@ -5,10 +5,18 @@
 #include"detection.h"
 #include"popcount.h"
 #include"rdtsc.h"
+<<<<<<< HEAD
 #include"MPI.h"
 
 #define SEUIL 10
 #define SIZE 4000
+=======
+
+
+#define SEUIL 10
+#define MAX 20000
+const char* filename = "description.txt";
+>>>>>>> 3fceac5 (Scatter ADD Final)
 
 //Genere la mapping des codons start et stop d'une sequence ADN
 gene_map mapping(char *seq){
@@ -227,6 +235,7 @@ void matching_rate(char *seq, char *seq2){
   //Parcours la plus grande sequence, de base en base
   while(seq[pos+mini-1]!='\0'){
     //Affiche le morceau de la grande sequence qui sera comparee 
+<<<<<<< HEAD
     /*for(int i=0;i<mini;i++)
       printf("%c",seq[pos+i]);
     */
@@ -235,6 +244,16 @@ void matching_rate(char *seq, char *seq2){
     /*for(int i=0;i<mini;i++)
       printf("%c",seq2[i]);
     */
+=======
+    for(int i=0;i<mini;i++)
+      printf("%c",seq[pos+i]);
+
+    printf("\n");
+    //Affiche la petite sequence qui sera comparee
+    for(int i=0;i<mini;i++)
+      printf("%c",seq2[i]);
+
+>>>>>>> 3fceac5 (Scatter ADD Final)
     //XOR caractere par caractere les deux chaines
     //Puis compte le nombre de bits a 1 total 
     for(int i=0;i<mini;i++)
@@ -246,13 +265,18 @@ void matching_rate(char *seq, char *seq2){
     d = d / (8*mini);
 
     //Affiche le résultat trouve
+<<<<<<< HEAD
     //printf("\n\nIl y a %lf%% de bits diférrents entre ces 2 séquences.\n\n",d);
+=======
+    printf("\n\nIl y a %lf%% de bits diférrents entre ces 2 séquences.\n\n",d);
+>>>>>>> 3fceac5 (Scatter ADD Final)
 
     d=0;
     pos++;
   }
 }
 
+<<<<<<< HEAD
 
 //
 int main(int argc, char **argv){
@@ -374,4 +398,82 @@ if (rank == 0) {
 
 
   return 0;
+=======
+//
+int main(int argc, char **argv){
+  //Check arg
+  /*if(argc<3)
+    return printf("Usage: %s [file seq1] [file seq2]\n",argv[0]);
+*/
+//Charge les codons en mémoire
+MPI_Init(&argc, &argv);
+char inmsg[30],outmsg0[30];
+int size, rank;
+MPI_Status status;
+MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+MPI_Comm_size(MPI_COMM_WORLD, &size);
+int Tag1 = 1000, Tag2, dest, source;
+char name_fileRecv[MAX][12] = {0};
+char y[10];
+if(rank == 0){ 
+  FILE *in_file = fopen(filename, "r");
+    char name_file[MAX][10];
+    struct stat sb;
+    stat(filename, &sb);
+
+    char *file_contents = malloc(sb.st_size);
+    int j =0;
+    while (fscanf(in_file, "%[^\n] ", file_contents) != EOF && j < MAX) {
+        //printf("%s\n", file_contents);
+        
+        int i =0;
+        while(file_contents[i] != ' '){
+                //chaine[i] = ;
+                name_file[j][i]= file_contents[i+1];
+               // printf("%c\n", name_file[j][i]);
+                i++;   
+              
+        }
+        //j++;
+            //printf("%s and %ld \n", name_file[j], strlen(name_file));
+            //dest = 1;
+          
+            
+              //MPI_Send(&name_file,strlen(name_file), MPI_CHAR, dest, Tag1, MPI_COMM_WORLD);
+
+    }
+           
+   // }
+    fclose(in_file);
+    exit(EXIT_SUCCESS);
+   // for(int k =0; k < MAX; k++)
+    MPI_Scatter(name_file, MAX/size, MPI_CHAR, y, MAX/size, MPI_CHAR, 0, MPI_COMM_WORLD);
+    
+       
+}else if (rank == 1) {
+        source = 0; int k = 0;
+        memset(inmsg, 0, 30);
+        for(int j = 0; j < MAX; j++){
+    MPI_Scatter(name_file, MAX/size, MPI_CHAR, y, MAX/size, MPI_CHAR, 0, MPI_COMM_WORLD);
+          //char path[20] = "../";
+          //strcat(path, inmsg);
+          printf("%s\n",y);
+        
+         /*FILE *in_file2 = fopen(inmsg, "r");
+          if(in_file2 == NULL)
+          {
+            printf("Error!");   
+          }else
+            printf("openning file");
+          //printf("*** CHARGE LA PREMIERE SEQUENCE ***\n\n");
+          //Charge la sequence
+          //char *seq=load_data(argv[1]);
+            fclose(in_file2);
+        */}
+        //printf("its rank %d", rank);
+}
+  
+MPI_Finalize();
+return 0;
+>>>>>>> 3fceac5 (Scatter ADD Final)
 }
