@@ -301,8 +301,8 @@ if(rank == 0){
           MPI_Recv(&inmsg,30, MPI_CHAR, source, Tag1, MPI_COMM_WORLD,  MPI_STATUS_IGNORE);
           printf("%s\n",inmsg);
           char *seq = load_data(inmsg);
-          /*printf("*** MAPPING EN COURS ***\n\n");
-          //Map la sequence avec la structure
+          printf("*** MAPPING EN COURS ***\n\n");
+          /*Map la sequence avec la structure
           //gene_map gm=mapping(seq);
           
           printf("*** GENERATION DE L'ARN MESSAGER POUR CHAQUE GENE ***\n\n");
