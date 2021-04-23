@@ -301,7 +301,6 @@ if(rank == 0){
         for(int j = 0; j < MAX; j++){
           MPI_Recv(&inmsg,30, MPI_CHAR, source, Tag1, MPI_COMM_WORLD,  MPI_STATUS_IGNORE);
           printf("%s\n",inmsg);
-          
          char *seq = load_data(inmsg);
           printf("*** MAPPING EN COURS ***\n\n");
           //Map la sequence avec la structure
