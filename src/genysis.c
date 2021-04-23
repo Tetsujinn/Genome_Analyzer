@@ -286,23 +286,27 @@ if(rank == 0){
                 name_file[j][i]= file_contents[i+1];
                   //printf("%c\n", name_file[j][i]);
                   i++;    
-        }
-        
-            dest = 1;
-            MPI_Send(&name_file[j],10, MPI_CHAR, dest, Tag1, MPI_COMM_WORLD);
+        } 
             j++;
             printf("%d\n",j);
-            //printf("%s and %ld \n", name_file[j], strlen(name_file));
-                             
+            //printf("%s and %ld \n", name_file[j], strlen(name_file));                      
     } 
+    for(j =0; j<MAX; j++){
+            dest = 1;
+            MPI_Send(&name_file[j],10, MPI_CHAR, dest, Tag1, MPI_COMM_WORLD);
+    }
 }else if (rank == 1) {
         source = 0;
         memset(inmsg, 0, 30);
         for(int j = 0; j < MAX; j++){
           MPI_Recv(&inmsg,30, MPI_CHAR, source, Tag1, MPI_COMM_WORLD,  MPI_STATUS_IGNORE);
           printf("%s\n",inmsg);
+          
+         char *seq = load_data(inmsg);
+          printf("*** MAPPING EN COURS ***\n\n");
+          //Map la sequence avec la structure
+          //gene_map gm=mapping(seq);*/
         } 
-
         //printf("faux");
 }
   
