@@ -1,7 +1,7 @@
 CC=gcc
 
 CFLAGS=-Wall
-OFLAGS=-Ofast
+OFLAGS=-Ofast -fopenmp
 
 all: bin/genysis bin/split bin/split2
 
