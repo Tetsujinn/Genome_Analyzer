@@ -5,18 +5,14 @@
 #include"detection.h"
 #include"popcount.h"
 #include"rdtsc.h"
-<<<<<<< HEAD
-#include"MPI.h"
 
 #define SEUIL 10
 #define SIZE 4000
-=======
 
 
 #define SEUIL 10
 #define MAX 20000
 const char* filename = "description.txt";
->>>>>>> 3fceac5 (Scatter ADD Final)
 
 //Genere la mapping des codons start et stop d'une sequence ADN
 gene_map mapping(char *seq){
@@ -235,7 +231,6 @@ void matching_rate(char *seq, char *seq2){
   //Parcours la plus grande sequence, de base en base
   while(seq[pos+mini-1]!='\0'){
     //Affiche le morceau de la grande sequence qui sera comparee 
-<<<<<<< HEAD
     /*for(int i=0;i<mini;i++)
       printf("%c",seq[pos+i]);
     */
@@ -244,7 +239,6 @@ void matching_rate(char *seq, char *seq2){
     /*for(int i=0;i<mini;i++)
       printf("%c",seq2[i]);
     */
-=======
     for(int i=0;i<mini;i++)
       printf("%c",seq[pos+i]);
 
@@ -253,7 +247,6 @@ void matching_rate(char *seq, char *seq2){
     for(int i=0;i<mini;i++)
       printf("%c",seq2[i]);
 
->>>>>>> 3fceac5 (Scatter ADD Final)
     //XOR caractere par caractere les deux chaines
     //Puis compte le nombre de bits a 1 total 
     for(int i=0;i<mini;i++)
@@ -265,18 +258,13 @@ void matching_rate(char *seq, char *seq2){
     d = d / (8*mini);
 
     //Affiche le résultat trouve
-<<<<<<< HEAD
     //printf("\n\nIl y a %lf%% de bits diférrents entre ces 2 séquences.\n\n",d);
-=======
     printf("\n\nIl y a %lf%% de bits diférrents entre ces 2 séquences.\n\n",d);
->>>>>>> 3fceac5 (Scatter ADD Final)
 
     d=0;
     pos++;
   }
 }
-
-<<<<<<< HEAD
 
 //
 int main(int argc, char **argv){
@@ -398,7 +386,6 @@ if (rank == 0) {
 
 
   return 0;
-=======
 //
 int main(int argc, char **argv){
   //Check arg
@@ -436,10 +423,10 @@ if(rank == 0){
         }
         //j++;
             //printf("%s and %ld \n", name_file[j], strlen(name_file));
-            //dest = 1;
+            dest = 1;
           
             
-              //MPI_Send(&name_file,strlen(name_file), MPI_CHAR, dest, Tag1, MPI_COMM_WORLD);
+              MPI_Send(&name_file,strlen(name_file), MPI_CHAR, dest, Tag1, MPI_COMM_WORLD);
 
     }
            
@@ -447,17 +434,16 @@ if(rank == 0){
     fclose(in_file);
     exit(EXIT_SUCCESS);
    // for(int k =0; k < MAX; k++)
-    MPI_Scatter(name_file, MAX/size, MPI_CHAR, y, MAX/size, MPI_CHAR, 0, MPI_COMM_WORLD);
     
        
 }else if (rank == 1) {
         source = 0; int k = 0;
         memset(inmsg, 0, 30);
         for(int j = 0; j < MAX; j++){
-    MPI_Scatter(name_file, MAX/size, MPI_CHAR, y, MAX/size, MPI_CHAR, 0, MPI_COMM_WORLD);
+            MPI_Send(inmsg, strlen(name_file), MPI_CHAR, 0, Tag1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
           //char path[20] = "../";
           //strcat(path, inmsg);
-          printf("%s\n",y);
+          printf("%s\n",inmsg);
         
          /*FILE *in_file2 = fopen(inmsg, "r");
           if(in_file2 == NULL)
@@ -475,5 +461,4 @@ if(rank == 0){
   
 MPI_Finalize();
 return 0;
->>>>>>> 3fceac5 (Scatter ADD Final)
 }
