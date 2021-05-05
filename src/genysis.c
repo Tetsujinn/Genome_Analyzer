@@ -287,10 +287,11 @@ if(rank == 0){
                   //printf("%c\n", name_file[j][i]);
                   i++;    
         }
+        
             dest = 1;
-            MPI_Send(&name_file[j],strlen(name_file[j]), MPI_CHAR, dest, Tag1, MPI_COMM_WORLD);
+            MPI_Send(&name_file[j],10, MPI_CHAR, dest, Tag1, MPI_COMM_WORLD);
             j++;
-           
+            printf("%d\n",j);
             //printf("%s and %ld \n", name_file[j], strlen(name_file));
                              
     } 
