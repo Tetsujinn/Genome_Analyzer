@@ -272,6 +272,7 @@ int Tag1 = 1000, Tag2, dest, source;
 char name_fileRecv[MAX][12] = {0};
 
 if(rank == 0){ 
+  printf("vrai");
   FILE *in_file = fopen(filename, "r");
     char name_file[MAX][10];
     struct stat sb;
@@ -280,27 +281,28 @@ if(rank == 0){
     char *file_contents = malloc(sb.st_size);
     int j =0;
     while (fscanf(in_file, "%[^\n] ", file_contents) != EOF && j < MAX) {
-        //printf("%s\n", file_contents);
         int i =0;
         while(file_contents[i] != ' '){
-                //chaine[i] = ;
                 name_file[j][i]= file_contents[i+1];
-               // printf("%c\n", name_file[j][i]);
-                i++;    
+                  //printf("%c\n", name_file[j][i]);
+                  i++;    
         }
             dest = 1;
             MPI_Send(&name_file[j],strlen(name_file[j]), MPI_CHAR, dest, Tag1, MPI_COMM_WORLD);
             j++;
+           
             //printf("%s and %ld \n", name_file[j], strlen(name_file));
                              
-    }   
+    } 
 }else if (rank == 1) {
         source = 0;
         memset(inmsg, 0, 30);
         for(int j = 0; j < MAX; j++){
           MPI_Recv(&inmsg,30, MPI_CHAR, source, Tag1, MPI_COMM_WORLD,  MPI_STATUS_IGNORE);
           printf("%s\n",inmsg);
-        }
+        } 
+
+        //printf("faux");
 }
   
 MPI_Finalize();
