@@ -291,7 +291,7 @@ if(rank == 0){
             //printf("%d\n",j);
             //printf("%s and %ld \n", name_file[j], strlen(name_file));                      
             dest = 1;
-            if(k==size){
+            if(k==size+1){
               k=1;
             }
             MPI_Send(&name_file[j],12, MPI_CHAR, k, Tag1+1, MPI_COMM_WORLD);
@@ -304,7 +304,7 @@ if(rank == 0){
         //for(int j = 0; j < MAX; j++){
           MPI_Recv(&inmsg,12, MPI_CHAR, source, Tag1+1, MPI_COMM_WORLD,  MPI_STATUS_IGNORE);
           printf("%s\n",inmsg);
-          /*char *seq = load_data(inmsg);
+          char *seq = load_data(inmsg);
           printf("*** MAPPING EN COURS ***\n\n");
                     //Map la sequence avec la structure
           //gene_map gm=mapping(seq);
@@ -345,8 +345,8 @@ if(rank == 0){
           free(gm);
 
           //Libère la mémoire de la séquence
-          release_data(seq); */
-         // } 
+          release_data(seq); 
+          } 
 }
   
 MPI_Finalize();
