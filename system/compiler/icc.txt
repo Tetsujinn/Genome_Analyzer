@@ -1,0 +1,4 @@
+cat (Intel ® oneAPI HPC Toolkit)
+Copyright ® 2021 Intel Corporation.
+Intel(r)C++ Intel(r)64 Compiler Classic for applications running on Intel(r)64, Version 2021.1 Build 20201112_000000.
+See Intel’s Global Human Rights Principles. Intel’s products and software are intended only to be used in applications that do not cause or contribute to a violation of an internationally recognized human right.
