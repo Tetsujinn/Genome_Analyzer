@@ -263,7 +263,7 @@ int main(int argc, char **argv){
 */
 //Charge les codons en mémoire
 MPI_Init(&argc, &argv);
-char inmsg[30];
+char inmsg[12];
 int size, rank;
 MPI_Status status;
 MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -272,37 +272,41 @@ int Tag1 = 1000, Tag2, dest, source;
 char name_fileRecv[MAX][12] = {0};
 
 if(rank == 0){ 
-  printf("vrai");
+ // printf("vrai\n");
   FILE *in_file = fopen(filename, "r");
-    char name_file[MAX][10];
+    char name_file[MAX][12];
     struct stat sb;
     stat(filename, &sb);
 
     char *file_contents = malloc(sb.st_size);
-    int j =0;
+    int j =0, k = 1;
+
     while (fscanf(in_file, "%[^\n] ", file_contents) != EOF && j < MAX) {
         int i =0;
         while(file_contents[i] != ' '){
-                name_file[j][i]= file_contents[i+1];
+                  name_file[j][i]= file_contents[i+1];
                   //printf("%c\n", name_file[j][i]);
                   i++;    
         } 
             //printf("%d\n",j);
             //printf("%s and %ld \n", name_file[j], strlen(name_file));                      
             dest = 1;
-            MPI_Send(&name_file[j],10, MPI_CHAR, dest, Tag1, MPI_COMM_WORLD);
-            j++;
-
+            if(k==size){
+              k=1;
+            }
+            MPI_Send(&name_file[j],12, MPI_CHAR, k, Tag1+1, MPI_COMM_WORLD);
+            j++; k++;
     }
-}else if (rank == 1) {
+}else{
+  //printf("lounes");
         source = 0;
-        memset(inmsg, 0, 30);
-        for(int j = 0; j < MAX; j++){
-          MPI_Recv(&inmsg,30, MPI_CHAR, source, Tag1, MPI_COMM_WORLD,  MPI_STATUS_IGNORE);
+        memset(inmsg, 0, 12);
+        //for(int j = 0; j < MAX; j++){
+          MPI_Recv(&inmsg,12, MPI_CHAR, source, Tag1+1, MPI_COMM_WORLD,  MPI_STATUS_IGNORE);
           printf("%s\n",inmsg);
-          char *seq = load_data(inmsg);
+          /*char *seq = load_data(inmsg);
           printf("*** MAPPING EN COURS ***\n\n");
-          /*Map la sequence avec la structure
+                    //Map la sequence avec la structure
           //gene_map gm=mapping(seq);
           
           printf("*** GENERATION DE L'ARN MESSAGER POUR CHAQUE GENE ***\n\n");
@@ -318,7 +322,7 @@ if(rank == 0){
             pos=gm->gene_start[i];
 
             //On parcours le gene caractére par caractére pour les afficher
-            /*while(pos<=gm->gene_end[i]){
+            while(pos<=gm->gene_end[i]){
               printf("%c", seq[pos]);
               pos++;
             }
@@ -341,8 +345,8 @@ if(rank == 0){
           free(gm);
 
           //Libère la mémoire de la séquence
-          release_data(seq);*/
-          } 
+          release_data(seq); */
+         // } 
 }
   
 MPI_Finalize();

@@ -1,11 +1,10 @@
 #include<stdlib.h>
 #include<stdio.h>
 #include<string.h>
-/*
 #include<unistd.h>
 #include<sys/stat.h>
 #include<sys/types.h>
-*/
+
 #include"rdtsc.h"
 
 #define ALIGN 64
