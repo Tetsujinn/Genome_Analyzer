@@ -255,8 +255,24 @@ void matching_rate(char *seq, char *seq2){
   }
 }
 
+/* create thread argument struct for thr_func() */
+typedef struct _thread_data_t {
+  int tid;
+  double stuff;
+} thread_data_t;
+ 
+/* thread function */
+void *thr_func(void *arg) {
+  thread_data_t *data = (thread_data_t *)arg;
+ 
+  printf("hello from thr_func, thread id: %d\n", data->tid);
+ 
+  pthread_exit(NULL);
+}
+
 //
 int main(int argc, char **argv){
+  
   //Check arg
   /*if(argc<3)
     return printf("Usage: %s [file seq1] [file seq2]\n",argv[0]);
@@ -270,6 +286,12 @@ MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 MPI_Comm_size(MPI_COMM_WORLD, &size);
 int Tag1 = 1000, Tag2, dest, source;
 char name_fileRecv[MAX][12] = {0};
+
+//  
+pthread_t thr[NUM_THREADS];
+  int i, rc;
+  /* create a thread_data_t argument array */
+  thread_data_t thr_data[NUM_THREADS];
 
 if(rank == 0){ 
  // printf("vrai\n");
@@ -339,14 +361,31 @@ if(rank == 0){
           for(int i=0; i < gm->gene_counter; i++){
             detect_mut(ARN_m[i]);
           }
-
+          
+  
           free(ARN_m);
           //Libère la mémoire du mapping
           free(gm);
 
           //Libère la mémoire de la séquence
           release_data(seq); 
-          } 
+          
+          //
+          /* create threads */
+          for (i = 0; i < NUM_THREADS; ++i) {
+            thr_data[i].tid = i;
+            if ((rc = pthread_create(&thr[i], NULL, thr_func, &thr_data[i]))) {
+              fprintf(stderr, "error: pthread_create, rc: %d\n", rc);
+              return EXIT_FAILURE;
+            }
+          }
+          /* block until all threads complete */
+          for (i = 0; i < NUM_THREADS; ++i) {
+            pthread_join(thr[i], NULL);
+          }
+
+          return EXIT_SUCCESS;
+} 
 }
   
 MPI_Finalize();
