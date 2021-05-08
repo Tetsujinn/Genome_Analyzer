@@ -1,6 +1,7 @@
 #include<unistd.h>
 #include<string.h>
 #include<mpi.h>
+#include<omp.h>
 #include"load.h"
 #include"detection.h"
 #include"popcount.h"
@@ -72,22 +73,27 @@ char **generate_ARN(gene_map gm,char* seq){
   //Alloue de la memoire pour stocker les ARN dans un tableau
   char** ARN_m = (char **)malloc(gm->gene_counter*sizeof(char*));
   //Pour chaque ligne on alloue l'espace nécessaire pour stocker le gene en ARN
-  for(int i=0; i < gm->gene_counter; i++)
+  int i;
+  int counter = gm->gene_counter;
+#pragma omp parallel private(i) shared(counter) 
+{
+  #pragma omp for
+  for(i=0; i < counter; i++)
     ARN_m[i] = (char *)malloc(gm->gene_end[i] - gm->gene_start[i] + 1 *sizeof(char));
 
 
   int pos=0;
   int pos_arn=0;
   //Pour chaque gene trouvé
-  //#pragma omp parallel private(i)
+  #pragma omp for 
   for(int i=0; i < gm->gene_counter; i++){
     //Init la pos au debut du gene
-    pos=gm->gene_start[i];
 
+    pos=gm->gene_start[i];
     pos_arn=0;
 
     //On parcours le gene caractére par caractére pour l'afficher sous forme ADN
-    while(pos<=gm->gene_end[i]){
+    while(pos <= gm->gene_end[i]){
       //Si on croise le caractère T on le remplace par U
       if(seq[pos]=='T')
         ARN_m[i][pos_arn]='U';
@@ -98,6 +104,11 @@ char **generate_ARN(gene_map gm,char* seq){
       pos_arn++;
     }
   }
+
+
+}
+  
+
 
   return ARN_m;
 }
@@ -115,6 +126,7 @@ void generate_prot(char *arn, char **codons){
   printf("ARN_m : ");
   
   //Parcours chaque codons de la sequence ARN
+  
   for(pos=0; pos<nb_prot; pos++){
   	//Recupere le codon dans prot
     prot[0]=arn[pos*3];
@@ -133,15 +145,23 @@ void generate_prot(char *arn, char **codons){
     symbols[pos]=i+2;
     printf("%s ",prot);
   }
+  
+
+#pragma omp parallel
+{
   //Affichage en parcourant chaque proteine obtenu
   printf("\n(Short name) Protein : ");
+  #pragma omp for
+  
   for(pos=0; pos<nb_prot; pos++)
     printf("%s ",codons[short_names[pos]]);
   printf("\n(Symbol) Protein : ");
+  
+  #pragma omp for
   for(pos=0; pos<nb_prot; pos++)
     printf("%s ",codons[symbols[pos]]);
   printf("\n");
-
+}
 }
 
 //
@@ -255,20 +275,7 @@ void matching_rate(char *seq, char *seq2){
   }
 }
 
-/* create thread argument struct for thr_func() */
-typedef struct _thread_data_t {
-  int tid;
-  double stuff;
-} thread_data_t;
- 
-/* thread function */
-void *thr_func(void *arg) {
-  thread_data_t *data = (thread_data_t *)arg;
- 
-  printf("hello from thr_func, thread id: %d\n", data->tid);
- 
-  pthread_exit(NULL);
-}
+
 
 //
 int main(int argc, char **argv){

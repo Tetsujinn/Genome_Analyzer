@@ -17,4 +17,4 @@ do
 done
 
 #Execution des analyses
-./bin/genysis LC528232.1 MW049014.1 
+./bin/genysis LC528232.1
