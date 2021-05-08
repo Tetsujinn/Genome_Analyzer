@@ -79,7 +79,7 @@ char **generate_ARN(gene_map gm,char* seq){
   int pos=0;
   int pos_arn=0;
   //Pour chaque gene trouvé
-  #pragma omp parallel private(i)
+  //#pragma omp parallel private(i)
   for(int i=0; i < gm->gene_counter; i++){
     //Init la pos au debut du gene
     pos=gm->gene_start[i];
