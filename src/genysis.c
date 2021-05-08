@@ -295,10 +295,6 @@ int Tag1 = 1000, Tag2, dest, source;
 char name_fileRecv[MAX][12] = {0};
 
 //  
-pthread_t thr[NUM_THREADS];
-  int i, rc;
-  /* create a thread_data_t argument array */
-  thread_data_t thr_data[NUM_THREADS];
 
 if(rank == 0){ 
  // printf("vrai\n");
@@ -378,18 +374,7 @@ if(rank == 0){
           release_data(seq); 
           
           //
-          /* create threads */
-          for (i = 0; i < NUM_THREADS; ++i) {
-            thr_data[i].tid = i;
-            if ((rc = pthread_create(&thr[i], NULL, thr_func, &thr_data[i]))) {
-              fprintf(stderr, "error: pthread_create, rc: %d\n", rc);
-              return EXIT_FAILURE;
-            }
-          }
-          /* block until all threads complete */
-          for (i = 0; i < NUM_THREADS; ++i) {
-            pthread_join(thr[i], NULL);
-          }
+          
 
           return EXIT_SUCCESS;
 } 
