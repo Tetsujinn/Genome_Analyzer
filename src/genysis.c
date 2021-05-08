@@ -259,9 +259,12 @@ void matching_rate(char *seq, char *seq2){
 
     //XOR caractere par caractere les deux chaines
     //Puis compte le nombre de bits a 1 total 
-    for(int i=0;i<mini;i++)
+    for(int i=0;i<mini;i+=4){
       d += popcount( seq[pos+i] ^ seq2[i] );
-
+      d += popcount( seq[pos+i+1] ^ seq2[i+1] );
+      d += popcount( seq[pos+i+2] ^ seq2[i+2] );
+      d += popcount( seq[pos+i+3] ^ seq2[i+3] );
+    }
     //Nombre total de bits -> 100% de bits differents
     //Nombre de bit a 1    -> y% de bits differents
     d = d * 100;
